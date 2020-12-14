@@ -1,0 +1,9 @@
+---
+Name: defer-backend
+---
+LeKoala\DeferBackend\CspProvider:
+  default_referrer_policy: "no-referrer-when-downgrade"
+  enable_hsts: true
+  enable_cst: false
+  csp_report_uri: ''
+  csp_report_only: true
