@@ -33,6 +33,32 @@ class DeferBackend extends Requirements_Backend
     }
 
     /**
+     * @param Requirements_Backend $oldBackend defaults to current backend
+     * @return $this
+     */
+    public static function replaceBackend(Requirements_Backend $oldBackend = null)
+    {
+        if ($oldBackend === null) {
+            $oldBackend = Requirements::backend();
+        }
+        $deferBackend = new static;
+        foreach ($oldBackend->getCSS() as $file => $opts) {
+            $deferBackend->css($file, null, $opts);
+        }
+        foreach ($oldBackend->getJavascript() as $file => $opts) {
+            $deferBackend->javascript($file, null, $opts);
+        }
+        foreach ($oldBackend->getCustomCSS() as $id => $script) {
+            $deferBackend->customCSS($script, $id);
+        }
+        foreach ($oldBackend->getCustomScripts() as $id => $script) {
+            $deferBackend->customScript($script, $id);
+        }
+        Requirements::set_backend($deferBackend);
+        return $deferBackend;
+    }
+
+    /**
      * @inheritDoc
      */
     public function javascript($file, $options = array())

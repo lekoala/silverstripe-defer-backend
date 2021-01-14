@@ -17,7 +17,7 @@ In order to defer your scripts, you need to replace in your `PageController` the
     {
         parent::init();
 
-        Requirements::set_backend(new DeferBackend);
+        DeferBackend::replaceBackend();
     }
 
 Once this is done, all scripts (provided by modules or yourself) will be deferred. This is great
