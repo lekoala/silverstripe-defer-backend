@@ -54,6 +54,17 @@ You can pass an array of options instead of just "type" parameter.
 In order to support my [cookieconsent module](https://github.com/lekoala/silverstripe-cookieconsent) you
 can now pass an additionnal option "cookie-consent" to your javascript files to load them conditionnaly.
 
+```php
+Requirements::javascript('myscript.js',['cookie-consent' => 'tracking']);
+```
+
+This also work (kind of) for custom scripts. Since the requirements api does not support anything
+outside script and uniquenessID, we append the cookie type to the uniquess id
+
+```php
+Requirements::customScript($script, "ga-tracking");
+```
+
 ## Security headers
 
 As a small bonus, this module allows you to add two security headers:

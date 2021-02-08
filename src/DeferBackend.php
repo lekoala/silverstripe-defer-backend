@@ -61,6 +61,14 @@ class DeferBackend extends Requirements_Backend
     }
 
     /**
+     * @return array
+     */
+    public static function listCookieTypes()
+    {
+        return ['strictly-necessary', 'functionality', 'tracking', 'targeting'];
+    }
+
+    /**
      * Register the given JavaScript file as required.
      *
      * @param string $file Either relative to docroot or in the form "vendor/package:resource"
@@ -80,7 +88,7 @@ class DeferBackend extends Requirements_Backend
             $options['defer'] = true;
         }
         if (isset($options['cookie-consent'])) {
-            if (!in_array($options['cookie-consent'], ['strictly-necessary', 'functionality', 'tracking', 'targeting'])) {
+            if (!in_array($options['cookie-consent'], self::listCookieTypes())) {
                 throw new InvalidArgumentException("The cookie-consent value is invalid, it must be one of: strictly-necessary,functionality,tracking,targeting");
             }
             // switch to text plain for conditional loading
@@ -119,7 +127,10 @@ class DeferBackend extends Requirements_Backend
     }
 
     /**
-     * @inheritDoc
+     * Register the given JavaScript code into the list of requirements
+     *
+     * @param string $script The script content as a string (without enclosing `<script>` tag)
+     * @param string $uniquenessID A unique ID that ensures a piece of code is only added once. Append -cookie-type for consent support
      */
     public function customScript($script, $uniquenessID = null)
     {
@@ -205,18 +216,33 @@ class DeferBackend extends Requirements_Backend
             if (!empty($attributes['cookie-consent'])) {
                 $htmlAttributes['cookie-consent'] = $attributes['cookie-consent'];
             }
-            $jsRequirements .= HTML::createTag('script', $attributes);
+            $jsRequirements .= HTML::createTag('script', $htmlAttributes);
             $jsRequirements .= "\n";
         }
 
         // Add all inline JavaScript *after* including external files they might rely on
-        foreach ($this->getCustomScripts() as $script) {
+        foreach ($this->getCustomScripts() as $scriptId => $script) {
+            if (is_numeric($scriptId)) {
+                $script = $scriptId;
+                $scriptId = null;
+            }
+            $attributes = [
+                'type' => 'application/javascript',
+                'nonce' => $nonce,
+            ];
+            // For cookie-consent, since the Requirements API does not support passing variables
+            // we rely on last part of uniquness id
+            if ($scriptId) {
+                $parts = explode("-", $scriptId);
+                $lastPart = array_pop($parts);
+                if (in_array($lastPart, self::listCookieTypes())) {
+                    $attributes['type'] = 'text/plain';
+                    $attributes['cookie-consent'] = $lastPart;
+                }
+            }
             $jsRequirements .= HTML::createTag(
                 'script',
-                [
-                    'type' => 'application/javascript',
-                    'nonce' => $nonce,
-                ],
+                $attributes,
                 "//<![CDATA[\n{$script}\n//]]>"
             );
             $jsRequirements .= "\n";
