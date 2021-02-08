@@ -124,7 +124,7 @@ class DeferBackend extends Requirements_Backend
     public function customScript($script, $uniquenessID = null)
     {
         // Wrap script in a DOMContentLoaded
-        // Make sure we don't add the eventListener twice
+        // Make sure we don't add the eventListener twice (this will only work for simple scripts)
         // @link https://stackoverflow.com/questions/41394983/how-to-defer-inline-javascript
         if (strpos($script, 'window.addEventListener') === false) {
             $script = "window.addEventListener('DOMContentLoaded', function() { $script });";
@@ -196,7 +196,16 @@ class DeferBackend extends Requirements_Backend
             if (!empty($attributes['defer'])) {
                 $htmlAttributes['defer'] = 'defer';
             }
-            $jsRequirements .= HTML::createTag('script', $htmlAttributes);
+            if (!empty($attributes['integrity'])) {
+                $htmlAttributes['integrity'] = $attributes['integrity'];
+            }
+            if (!empty($attributes['crossorigin'])) {
+                $htmlAttributes['crossorigin'] = $attributes['crossorigin'];
+            }
+            if (!empty($attributes['cookie-consent'])) {
+                $htmlAttributes['cookie-consent'] = $attributes['cookie-consent'];
+            }
+            $jsRequirements .= HTML::createTag('script', $attributes);
             $jsRequirements .= "\n";
         }
 
