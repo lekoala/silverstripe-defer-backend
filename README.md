@@ -59,7 +59,7 @@ Requirements::javascript('myscript.js',['cookie-consent' => 'tracking']);
 ```
 
 This also work (kind of) for custom scripts. Since the requirements api does not support anything
-outside script and uniquenessID, we append the cookie type to the uniquess id
+outside script and uniquenessID, we append the cookie type to the uniquenessID id
 
 ```php
 Requirements::customScript($script, "ga-tracking");
