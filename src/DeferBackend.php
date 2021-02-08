@@ -4,8 +4,10 @@ namespace LeKoala\DeferBackend;
 
 use Exception;
 use SilverStripe\View\HTML;
+use InvalidArgumentException;
 use SilverStripe\View\SSViewer;
 use SilverStripe\View\Requirements;
+use SilverStripe\View\ThemeResourceLoader;
 use SilverStripe\View\Requirements_Backend;
 
 /**
@@ -59,7 +61,17 @@ class DeferBackend extends Requirements_Backend
     }
 
     /**
-     * @inheritDoc
+     * Register the given JavaScript file as required.
+     *
+     * @param string $file Either relative to docroot or in the form "vendor/package:resource"
+     * @param array $options List of options. Available options include:
+     * - 'provides' : List of scripts files included in this file
+     * - 'async' : Boolean value to set async attribute to script tag
+     * - 'defer' : Boolean value to set defer attribute to script tag (true by default)
+     * - 'type' : Override script type= value.
+     * - 'integrity' : SubResource Integrity hash
+     * - 'crossorigin' : Cross-origin policy for the resource
+     * - 'cookie-consent' : Type of cookie for conditionnal loading : strictly-necessary,functionality,tracking,targeting
      */
     public function javascript($file, $options = array())
     {
@@ -67,7 +79,43 @@ class DeferBackend extends Requirements_Backend
         if (!isset($options['defer'])) {
             $options['defer'] = true;
         }
-        return parent::javascript($file, $options);
+        if (isset($options['cookie-consent'])) {
+            if (!in_array($options['cookie-consent'], ['strictly-necessary', 'functionality', 'tracking', 'targeting'])) {
+                throw new InvalidArgumentException("The cookie-consent value is invalid, it must be one of: strictly-necessary,functionality,tracking,targeting");
+            }
+            // switch to text plain for conditional loading
+            $options['type'] = 'text/plain';
+        }
+        parent::javascript($file, $options);
+        if (isset($options['cookie-consent'])) {
+            $this->javascript[$file]['cookie-consent'] = $options['cookie-consent'];
+        }
+    }
+
+    /**
+     * @param string $name
+     * @param string|array $type Pass the type or an array of options
+     * @return void
+     */
+    public function themedJavascript($name, $type = null)
+    {
+        $path = ThemeResourceLoader::inst()->findThemedJavascript($name, SSViewer::get_themes());
+        if ($path) {
+            $opts = [];
+            if ($type) {
+                if (is_string($type)) {
+                    $opts['type'] = $type;
+                } elseif (is_array($type)) {
+                    $opts = $type;
+                }
+            }
+            $this->javascript($path, $opts);
+        } else {
+            throw new InvalidArgumentException(
+                "The javascript file doesn't exist. Please check if the file $name.js exists in any "
+                    . "context or search for themedJavascript references calling this file in your templates."
+            );
+        }
     }
 
     /**

@@ -13,12 +13,14 @@ As a nice bonus, it also allows you to set a simple content security policy by a
 
 In order to defer your scripts, you need to replace in your `PageController` the default backend.
 
-    protected function init()
-    {
-        parent::init();
+```php
+protected function init()
+{
+    parent::init();
 
-        DeferBackend::replaceBackend();
-    }
+    DeferBackend::replaceBackend();
+}
+```
 
 Once this is done, all scripts (provided by modules or yourself) will be deferred. This is great
 for performance because all scripts become non blocking and load order is preserved.
@@ -30,7 +32,9 @@ the html.
 Deferring inline scripts is not possible as such. But since events are fired once the dom is parsed,
 you can wrap your scripts like so
 
-    window.addEventListener('DOMContentLoaded', function() { ... });
+```js
+window.addEventListener('DOMContentLoaded', function() { ... });
+```
 
 This module automatically does this. Be aware that if you rely on global variables, you might want to
 prevent this from happening by adding a comment with `//window.addEventListener` somewhere. This
@@ -41,20 +45,31 @@ will prevent our class to automatically wrap your script.
 This module also check your css files and make sure your themes files are loaded last. This make
 sure that your styles cascade properly.
 
+## Themed javascript
+
+You can pass an array of options instead of just "type" parameter.
+
+## Cookie consent
+
+In order to support my [cookieconsent module](https://github.com/lekoala/silverstripe-cookieconsent) you
+can now pass an additionnal option "cookie-consent" to your javascript files to load them conditionnaly.
+
 ## Security headers
 
 As a small bonus, this module allows you to add two security headers:
 - Referrer-Policy
 - Strict-Transport-Security (only if https is enabled)
 
-    public function handleRequest(HTTPRequest $request)
-    {
-        $response = parent::handleRequest($request);
+```php
+public function handleRequest(HTTPRequest $request)
+{
+    $response = parent::handleRequest($request);
 
-        CspProvider::addSecurityHeaders($response);
+    CspProvider::addSecurityHeaders($response);
 
-        return $response;
-    }
+    return $response;
+}
+```
 
 ## Content security policy
 
@@ -63,21 +78,24 @@ Content Security Policy.
 
 Also, a `$getCspNonce` is made available in your templates.
 
-    public function handleRequest(HTTPRequest $request)
-    {
-        $response = parent::handleRequest($request);
+```php
+public function handleRequest(HTTPRequest $request)
+{
+    $response = parent::handleRequest($request);
 
-        CspProvider::addCspHeaders($response);
+    CspProvider::addCspHeaders($response);
 
-        return $response;
-    }
-
+    return $response;
+}
+```
 Please note that the csp is disabled by default. You might want to enable it with the following config:
 
-    LeKoala\DeferBackend\CspProvider:
-    enable_cst: true
-    csp_report_uri: 'https://my-url-here'
-    csp_report_only: false
+```yml
+LeKoala\DeferBackend\CspProvider:
+  enable_cst: true
+  csp_report_uri: 'https://my-url-here'
+  csp_report_only: false
+```
 
 Consider setting this to `csp_report_only` at the beginnning because enabling csp can break your website.
 
