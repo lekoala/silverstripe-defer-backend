@@ -127,27 +127,6 @@ class DeferBackend extends Requirements_Backend
     }
 
     /**
-     * Register the given JavaScript code into the list of requirements
-     *
-     * @param string $script The script content as a string (without enclosing `<script>` tag)
-     * @param string $uniquenessID A unique ID that ensures a piece of code is only added once. Append -cookie-type for consent support
-     */
-    public function customScript($script, $uniquenessID = null)
-    {
-        // Wrap script in a DOMContentLoaded
-        // Make sure we don't add the eventListener twice (this will only work for simple scripts)
-        // @link https://stackoverflow.com/questions/41394983/how-to-defer-inline-javascript
-        if (strpos($script, 'window.addEventListener') === false) {
-            $script = "window.addEventListener('DOMContentLoaded', function() { $script });";
-        }
-
-        // Remove comments if any
-        $script = preg_replace('/(?:(?:\/\*(?:[^*]|(?:\*+[^*\/]))*\*+\/)|(?:(?<!\:|\\\|\'|\")\/\/.*))/', '', $script);
-
-        return parent::customScript($script, $uniquenessID);
-    }
-
-    /**
      * Get all css files
      *
      * @return array
@@ -240,6 +219,18 @@ class DeferBackend extends Requirements_Backend
                     $attributes['cookie-consent'] = $lastPart;
                 }
             }
+
+            // Wrap script in a DOMContentLoaded
+            // Make sure we don't add the eventListener twice (this will only work for simple scripts)
+            // Make sure we don't wrap scripts concerned by security policies
+            // @link https://stackoverflow.com/questions/41394983/how-to-defer-inline-javascript
+            if (empty($attributes['cookie-consent']) && strpos($script, 'window.addEventListener') === false) {
+                $script = "window.addEventListener('DOMContentLoaded', function() { $script });";
+            }
+
+            // Remove comments if any
+            $script = preg_replace('/(?:(?:\/\*(?:[^*]|(?:\*+[^*\/]))*\*+\/)|(?:(?<!\:|\\\|\'|\")\/\/.*))/', '', $script);
+
             $jsRequirements .= HTML::createTag(
                 'script',
                 $attributes,
