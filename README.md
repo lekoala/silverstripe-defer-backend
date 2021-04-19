@@ -82,6 +82,23 @@ public function handleRequest(HTTPRequest $request)
 }
 ```
 
+## Js modules support
+
+If you want to use [native js modules](https://javascript.info/modules-intro), this can
+be done with the following config flag:`
+
+```yml
+LeKoala\DeferBackend\DeferBackend:
+  enable_js_modules: true
+```
+
+Js modules are deferred by default as well. In addition, script with `type=module` are only
+loaded by modern browser, which can be really nice if you want to use modern browsers
+and let other older browsers experience a js-less webpage.
+
+This allows you to use native es6 syntax without bundlers like webpack, etc. at the cost
+of not supporting older browsers.
+
 ## Content security policy
 
 This module also add random nonce to your scripts. This allows you to setup a simple

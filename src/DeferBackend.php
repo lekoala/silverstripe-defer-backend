@@ -5,6 +5,7 @@ namespace LeKoala\DeferBackend;
 use Exception;
 use SilverStripe\View\HTML;
 use InvalidArgumentException;
+use SilverStripe\Core\Config\Configurable;
 use SilverStripe\View\SSViewer;
 use SilverStripe\View\Requirements;
 use SilverStripe\View\ThemeResourceLoader;
@@ -19,6 +20,14 @@ use SilverStripe\View\Requirements_Backend;
  */
 class DeferBackend extends Requirements_Backend
 {
+    use Configurable;
+
+    /**
+     * @config
+     * @var boolean
+     */
+    private static $enable_js_modules = false;
+
     // It's better to write to the head with defer
     public $writeJavascriptToBody = false;
 
@@ -83,9 +92,19 @@ class DeferBackend extends Requirements_Backend
      */
     public function javascript($file, $options = array())
     {
-        // We want to defer by default, but we can disable it if needed
-        if (!isset($options['defer'])) {
-            $options['defer'] = true;
+        if (self::config()->enable_js_modules) {
+            if (empty($options['type']) && self::config()->enable_js_modules) {
+                $options['type'] = 'module';
+            }
+            // Modules are deferred by default
+            if (isset($options['defer']) && $options['type'] == "module") {
+                unset($options['defer']);
+            }
+        } else {
+            // We want to defer by default, but we can disable it if needed
+            if (!isset($options['defer'])) {
+                $options['defer'] = true;
+            }
         }
         if (isset($options['cookie-consent'])) {
             if (!in_array($options['cookie-consent'], self::listCookieTypes())) {
@@ -109,15 +128,15 @@ class DeferBackend extends Requirements_Backend
     {
         $path = ThemeResourceLoader::inst()->findThemedJavascript($name, SSViewer::get_themes());
         if ($path) {
-            $opts = [];
+            $options = [];
             if ($type) {
                 if (is_string($type)) {
-                    $opts['type'] = $type;
+                    $options['type'] = $type;
                 } elseif (is_array($type)) {
-                    $opts = $type;
+                    $options = $type;
                 }
             }
-            $this->javascript($path, $opts);
+            $this->javascript($path, $options);
         } else {
             throw new InvalidArgumentException(
                 "The javascript file doesn't exist. Please check if the file $name.js exists in any "
@@ -201,12 +220,9 @@ class DeferBackend extends Requirements_Backend
 
         // Add all inline JavaScript *after* including external files they might rely on
         foreach ($this->getCustomScripts() as $scriptId => $script) {
-            if (is_numeric($scriptId)) {
-                $script = $scriptId;
-                $scriptId = null;
-            }
+            $type = self::config()->enable_js_modules ? 'module' : 'application/javascript';
             $attributes = [
-                'type' => 'application/javascript',
+                'type' => $type,
                 'nonce' => $nonce,
             ];
             // For cookie-consent, since the Requirements API does not support passing variables
@@ -223,8 +239,9 @@ class DeferBackend extends Requirements_Backend
             // Wrap script in a DOMContentLoaded
             // Make sure we don't add the eventListener twice (this will only work for simple scripts)
             // Make sure we don't wrap scripts concerned by security policies
+            // Js modules are deferred by default, even if they are inlined, so not wrapping needed
             // @link https://stackoverflow.com/questions/41394983/how-to-defer-inline-javascript
-            if (empty($attributes['cookie-consent']) && strpos($script, 'window.addEventListener') === false) {
+            if (empty($attributes['cookie-consent']) && strpos($script, 'window.addEventListener') === false && !self::config()->enable_js_modules) {
                 $script = "window.addEventListener('DOMContentLoaded', function() { $script });";
             }
 
