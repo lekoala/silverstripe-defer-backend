@@ -83,6 +83,9 @@ class DeferBackend extends Requirements_Backend
      */
     public function javascript($file, $options = array())
     {
+        if (!is_array($options)) {
+            $options = [];
+        }
         // We want to defer by default, but we can disable it if needed
         if (!isset($options['defer'])) {
             $options['defer'] = true;
