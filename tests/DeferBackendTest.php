@@ -39,8 +39,13 @@ class DeferBackendTest extends SapphireTest
         $backend = new DeferBackend;
         $backend->customScript("var test = 'test';");
 
-        $scripts = $backend->getCustomScripts();
-        $script = $scripts[0];
-        $this->assertContains("window.addEventListener('DOMContentLoaded'", $script);
+        $sampleHTML = <<<HTML
+<html>
+<head></head>
+<body></body>
+</html>
+HTML;
+        $sampleHTML = $backend->includeInHTML($sampleHTML);
+        $this->assertContains("window.addEventListener('DOMContentLoaded'", $sampleHTML);
     }
 }
