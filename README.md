@@ -120,7 +120,7 @@ Please note that the csp is disabled by default. You might want to enable it wit
 
 ```yml
 LeKoala\DeferBackend\CspProvider:
-  enable_cst: true
+  enable_csp: true
   csp_report_uri: 'https://my-url-here'
   csp_report_only: false
 ```

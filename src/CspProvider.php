@@ -39,7 +39,7 @@ class CspProvider implements TemplateGlobalProvider
      * @config
      * @var bool
      */
-    private static $enable_cst = false;
+    private static $enable_csp = false;
 
     /**
      * @config
