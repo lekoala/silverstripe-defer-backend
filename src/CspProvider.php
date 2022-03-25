@@ -83,6 +83,16 @@ class CspProvider implements TemplateGlobalProvider
     }
 
     /**
+     * Allow setting nonce from an external source
+     * @param  string $nonce
+     * @return void
+     */
+    public static function setCspNonce($nonce)
+    {
+        self::$csp_nonce = $nonce;
+    }
+
+    /**
      * @param HTTPResponse $response
      * @return HTTPResponse
      */
