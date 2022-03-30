@@ -78,6 +78,14 @@ class DeferBackend extends Requirements_Backend
     }
 
     /**
+     * @return array
+     */
+    public static function listScriptTypes()
+    {
+        return ['module', 'application/javascript'];
+    }
+
+    /**
      * Register the given JavaScript file as required.
      *
      * @param string $file Either relative to docroot or in the form "vendor/package:resource"
@@ -229,13 +237,16 @@ class DeferBackend extends Requirements_Backend
                 'nonce' => $nonce,
             ];
             // For cookie-consent, since the Requirements API does not support passing variables
-            // we rely on last part of uniquness id
+            // we rely on last part of uniqueness id
             if ($scriptId) {
-                $parts = explode("-", $scriptId);
+                $parts = explode("_", $scriptId);
                 $lastPart = array_pop($parts);
                 if (in_array($lastPart, self::listCookieTypes())) {
                     $attributes['type'] = 'text/plain';
                     $attributes['cookie-consent'] = $lastPart;
+                }
+                if (in_array($lastPart, self::listScriptTypes())) {
+                    $attributes['type'] = $lastPart;
                 }
             }
 
