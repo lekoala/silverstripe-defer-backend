@@ -107,15 +107,15 @@ class DeferBackend extends Requirements_Backend
             if (empty($options['type']) && self::config()->enable_js_modules) {
                 $options['type'] = 'module';
             }
-            // Modules are deferred by default
-            if (isset($options['defer']) && $options['type'] == "module") {
-                unset($options['defer']);
-            }
         } else {
             // We want to defer by default, but we can disable it if needed
             if (!isset($options['defer'])) {
                 $options['defer'] = true;
             }
+        }
+        // Modules are deferred by default
+        if (isset($options['defer']) && isset($options['type']) && $options['type'] == "module") {
+            unset($options['defer']);
         }
         if (isset($options['cookie-consent'])) {
             if (!in_array($options['cookie-consent'], self::listCookieTypes())) {
