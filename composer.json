@@ -26,7 +26,12 @@
         "squizlabs/php_codesniffer": "^3.0"
     },
     "extra": {
-        "installer-name": "defer-backend"
+        "installer-name": "defer-backend",
+        "allow-plugins": {
+            "composer/installers": true,
+            "silverstripe/vendor-plugin": true,
+            "silverstripe/recipe-plugin": true
+        }
     },
     "autoload": {
         "psr-4": {
