@@ -78,14 +78,6 @@ class DeferBackend extends Requirements_Backend
     }
 
     /**
-     * @return array
-     */
-    public static function listScriptTypes()
-    {
-        return ['module', 'application/javascript'];
-    }
-
-    /**
      * Register the given JavaScript file as required.
      *
      * @param string $file Either relative to docroot or in the form "vendor/package:resource"
@@ -107,15 +99,15 @@ class DeferBackend extends Requirements_Backend
             if (empty($options['type']) && self::config()->enable_js_modules) {
                 $options['type'] = 'module';
             }
+            // Modules are deferred by default
+            if (isset($options['defer']) && $options['type'] == "module") {
+                unset($options['defer']);
+            }
         } else {
             // We want to defer by default, but we can disable it if needed
             if (!isset($options['defer'])) {
                 $options['defer'] = true;
             }
-        }
-        // Modules are deferred by default
-        if (isset($options['defer']) && isset($options['type']) && $options['type'] == "module") {
-            unset($options['defer']);
         }
         if (isset($options['cookie-consent'])) {
             if (!in_array($options['cookie-consent'], self::listCookieTypes())) {
@@ -213,7 +205,8 @@ class DeferBackend extends Requirements_Backend
             if (!empty($attributes['async'])) {
                 $htmlAttributes['async'] = 'async';
             }
-            if (!empty($attributes['defer'])) {
+            // defer is not allowed for module, ignore it as it does the same anyway
+            if (!empty($attributes['defer']) && $htmlAttributes['type'] !== 'module') {
                 $htmlAttributes['defer'] = 'defer';
             }
             if (!empty($attributes['integrity'])) {
@@ -225,7 +218,7 @@ class DeferBackend extends Requirements_Backend
             if (!empty($attributes['cookie-consent'])) {
                 $htmlAttributes['cookie-consent'] = $attributes['cookie-consent'];
             }
-            $jsRequirements .= HTML::createTag('script', $htmlAttributes);
+            $jsRequirements .= str_replace(' />', '>', HTML::createTag('script', $htmlAttributes));
             $jsRequirements .= "\n";
         }
 
@@ -237,16 +230,13 @@ class DeferBackend extends Requirements_Backend
                 'nonce' => $nonce,
             ];
             // For cookie-consent, since the Requirements API does not support passing variables
-            // we rely on last part of uniqueness id
+            // we rely on last part of uniquness id
             if ($scriptId) {
-                $parts = explode("_", $scriptId);
+                $parts = explode("-", $scriptId);
                 $lastPart = array_pop($parts);
                 if (in_array($lastPart, self::listCookieTypes())) {
                     $attributes['type'] = 'text/plain';
                     $attributes['cookie-consent'] = $lastPart;
-                }
-                if (in_array($lastPart, self::listScriptTypes())) {
-                    $attributes['type'] = $lastPart;
                 }
             }
 
@@ -285,7 +275,7 @@ class DeferBackend extends Requirements_Backend
             if (!empty($params['media'])) {
                 $htmlAttributes['media'] = $params['media'];
             }
-            $requirements .= HTML::createTag('link', $htmlAttributes);
+            $requirements .= str_replace(' />', '>', HTML::createTag('link', $htmlAttributes));
             $requirements .= "\n";
         }
 
