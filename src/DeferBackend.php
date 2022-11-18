@@ -5,11 +5,12 @@ namespace LeKoala\DeferBackend;
 use Exception;
 use SilverStripe\View\HTML;
 use InvalidArgumentException;
-use SilverStripe\Core\Config\Configurable;
 use SilverStripe\View\SSViewer;
 use SilverStripe\View\Requirements;
+use SilverStripe\Core\Config\Configurable;
 use SilverStripe\View\ThemeResourceLoader;
 use SilverStripe\View\Requirements_Backend;
+use SilverStripe\Core\Manifest\ModuleResourceLoader;
 
 /**
  * A backend that defers everything by default
@@ -89,8 +90,9 @@ class DeferBackend extends Requirements_Backend
      * - 'integrity' : SubResource Integrity hash
      * - 'crossorigin' : Cross-origin policy for the resource
      * - 'cookie-consent' : Type of cookie for conditionnal loading : strictly-necessary,functionality,tracking,targeting
+     * - 'nomodule' : Boolean value to set nomodule attribute to script tag
      */
-    public function javascript($file, $options = array())
+    public function javascript($file, $options = [])
     {
         if (!is_array($options)) {
             $options = [];
@@ -116,9 +118,19 @@ class DeferBackend extends Requirements_Backend
             // switch to text plain for conditional loading
             $options['type'] = 'text/plain';
         }
+        if (isset($options['nomodule'])) {
+            // Force type regardless of global setting
+            $options['type'] = 'application/javascript';
+        }
         parent::javascript($file, $options);
+
+        $resolvedFile = ModuleResourceLoader::singleton()->resolvePath($file);
+        // Parent call doesn't store all attributes, so we adjust ourselves
         if (isset($options['cookie-consent'])) {
-            $this->javascript[$file]['cookie-consent'] = $options['cookie-consent'];
+            $this->javascript[$resolvedFile]['cookie-consent'] = $options['cookie-consent'];
+        }
+        if (isset($options['nomodule'])) {
+            $this->javascript[$resolvedFile]['nomodule'] = $options['nomodule'];
         }
     }
 
@@ -225,6 +237,9 @@ class DeferBackend extends Requirements_Backend
             }
             if (!empty($attributes['cookie-consent'])) {
                 $htmlAttributes['cookie-consent'] = $attributes['cookie-consent'];
+            }
+            if (!empty($attributes['nomodule'])) {
+                $htmlAttributes['nomodule'] = 'nomodule';
             }
             $jsRequirements .= str_replace(' />', '>', HTML::createTag('script', $htmlAttributes));
             $jsRequirements .= "\n";
