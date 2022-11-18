@@ -131,7 +131,7 @@ Consider setting this to `csp_report_only` at the beginnning because enabling cs
 
 ## Compatibility
 
-Tested with 4.6 but should work on any ^4 projects
+Tested with ^4.10
 
 ## Maintainer
 
