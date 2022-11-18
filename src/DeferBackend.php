@@ -57,7 +57,7 @@ class DeferBackend extends Requirements_Backend
             $deferBackend->css($file, null, $opts);
         }
         foreach ($oldBackend->getJavascript() as $file => $opts) {
-            $deferBackend->javascript($file, null, $opts);
+            $deferBackend->javascript($file, $opts);
         }
         foreach ($oldBackend->getCustomCSS() as $id => $script) {
             $deferBackend->customCSS($script, $id);
@@ -129,13 +129,16 @@ class DeferBackend extends Requirements_Backend
      */
     public function themedJavascript($name, $type = null)
     {
+        if ($type !== null && (!is_string($type) && !is_array($type))) {
+            throw new InvalidArgumentException("Type must be a string or an array");
+        }
         $path = ThemeResourceLoader::inst()->findThemedJavascript($name, SSViewer::get_themes());
         if ($path) {
             $options = [];
             if ($type) {
                 if (is_string($type)) {
                     $options['type'] = $type;
-                } elseif (is_array($type)) {
+                } else {
                     $options = $type;
                 }
             }
@@ -184,7 +187,12 @@ class DeferBackend extends Requirements_Backend
 
         // Skip if content isn't injectable, or there is nothing to inject
         $tagsAvailable = preg_match('#</head\b#', $content);
-        $hasFiles = $this->css || $this->javascript || $this->customCSS || $this->customScript || $this->customHeadTags;
+        $hasFiles = !empty($this->css)
+            || !empty($this->javascript)
+            || !empty($this->customCSS)
+            || !empty($this->customScript)
+            || !empty($this->customHeadTags);
+
         if (!$tagsAvailable || !$hasFiles) {
             return $content;
         }
