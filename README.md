@@ -1,6 +1,6 @@
 # SilverStripe Defer Backend module
 
-[![Build Status](https://travis-ci.com/lekoala/silverstripe-defer-backend.svg?branch=master)](https://travis-ci.com/lekoala/silverstripe-defer-backend/)
+![Build Status](https://github.com/lekoala/silverstripe-defer-backend/actions/workflows/ci.yml/badge.svg)
 [![scrutinizer](https://scrutinizer-ci.com/g/lekoala/silverstripe-defer-backend/badges/quality-score.png?b=master)](https://scrutinizer-ci.com/g/lekoala/silverstripe-defer-backend/)
 [![Code coverage](https://codecov.io/gh/lekoala/silverstripe-defer-backend/branch/master/graph/badge.svg)](https://codecov.io/gh/lekoala/silverstripe-defer-backend)
 
@@ -68,8 +68,9 @@ Requirements::customScript($script, "ga-tracking");
 ## Security headers
 
 As a small bonus, this module allows you to add two security headers:
-- Referrer-Policy
-- Strict-Transport-Security (only if https is enabled)
+
+-   Referrer-Policy
+-   Strict-Transport-Security (only if https is enabled)
 
 ```php
 public function handleRequest(HTTPRequest $request)
@@ -89,7 +90,7 @@ be done with the following config flag:`
 
 ```yml
 LeKoala\DeferBackend\DeferBackend:
-  enable_js_modules: true
+    enable_js_modules: true
 ```
 
 Js modules are deferred by default as well. In addition, script with `type=module` are only
@@ -116,13 +117,14 @@ public function handleRequest(HTTPRequest $request)
     return $response;
 }
 ```
+
 Please note that the csp is disabled by default. You might want to enable it with the following config:
 
 ```yml
 LeKoala\DeferBackend\CspProvider:
-  enable_csp: true
-  csp_report_uri: 'https://my-url-here'
-  csp_report_only: false
+    enable_csp: true
+    csp_report_uri: "https://my-url-here"
+    csp_report_only: false
 ```
 
 Consider setting this to `csp_report_only` at the beginnning because enabling csp can break your website.
