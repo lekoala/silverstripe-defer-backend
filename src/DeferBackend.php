@@ -229,9 +229,15 @@ class DeferBackend extends Requirements_Backend
                 'type' => $type,
                 'nonce' => $nonce,
             ];
-            // For cookie-consent, since the Requirements API does not support passing variables
-            // we rely on last part of uniquness id
+
+            // since the Requirements API does not support passing variables, we use naming conventions
             if ($scriptId) {
+                // Check for jsmodule in the name, since we have no other way to pass arguments
+                if (strpos($scriptId, "jsmodule") !== false) {
+                    $attributes['type'] = 'module';
+                }
+
+                // For cookie-consent, we rely on last part of uniquness id
                 $parts = explode("-", $scriptId);
                 $lastPart = array_pop($parts);
                 if (in_array($lastPart, self::listCookieTypes())) {
@@ -245,7 +251,7 @@ class DeferBackend extends Requirements_Backend
             // Make sure we don't wrap scripts concerned by security policies
             // Js modules are deferred by default, even if they are inlined, so not wrapping needed
             // @link https://stackoverflow.com/questions/41394983/how-to-defer-inline-javascript
-            if (empty($attributes['cookie-consent']) && strpos($script, 'window.addEventListener') === false && !self::config()->enable_js_modules) {
+            if (empty($attributes['cookie-consent']) && strpos($script, 'window.addEventListener') === false && $attributes['type'] !== 'module') {
                 $script = "window.addEventListener('DOMContentLoaded', function() { $script });";
             }
 
