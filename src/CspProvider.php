@@ -51,6 +51,12 @@ class CspProvider implements TemplateGlobalProvider
      * @config
      * @var string
      */
+    private static $frame_options = "SAMEORIGIN";
+
+    /**
+     * @config
+     * @var string
+     */
     private static $csp_report_uri = null;
 
     /**
@@ -113,6 +119,12 @@ class CspProvider implements TemplateGlobalProvider
         // enable HTTP Strict Transport Security
         if ($config->enable_hsts && $config->hsts_header && Director::is_https()) {
             $response->addHeader('Strict-Transport-Security', $config->hsts_header);
+        }
+        //
+        if ($config->frame_options) {
+            if (!$response->getHeader('X-Frame-Options')) {
+                $response->addHeader('X-Frame-Options', $config->frame_options);
+            }
         }
         return $response;
     }
