@@ -45,6 +45,12 @@ class CspProvider implements TemplateGlobalProvider
      * @config
      * @var string
      */
+    private static $frame_ancestors = "'self'";
+
+    /**
+     * @config
+     * @var string
+     */
     private static $csp_report_uri = null;
 
     /**
@@ -136,6 +142,11 @@ class CspProvider implements TemplateGlobalProvider
         $csp .= "object-src 'self';";
         $csp .= "img-src * data:;";
         $csp .= "font-src * data:;";
+
+        // @link https://cheatsheetseries.owasp.org/cheatsheets/Clickjacking_Defense_Cheat_Sheet.html#content-security-policy-frame-ancestors-examples
+        if ($config->frame_ancestors) {
+            $csp .= "frame-ancestors " . $config->frame_ancestors . ";";
+        }
 
         $report = $config->csp_report_uri;
         $reportOnly = $config->csp_report_only;
