@@ -58,6 +58,8 @@ class DeferBackend extends Requirements_Backend
             $deferBackend->css($file, null, $opts);
         }
         foreach ($oldBackend->getJavascript() as $file => $opts) {
+            // Old scripts may get defer=false even if the option is not passed due to no null state
+            unset($opts['defer']);
             $deferBackend->javascript($file, $opts);
         }
         foreach ($oldBackend->getCustomCSS() as $id => $script) {
