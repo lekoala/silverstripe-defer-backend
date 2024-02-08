@@ -10,8 +10,8 @@ use SilverStripe\View\TemplateGlobalProvider;
 /**
  * A dead simple csp provider
  *
- * Based on the concept here
- * @link https://websec.be/blog/cspstrictdynamic/
+ * @link https://csp.withgoogle.com/docs/strict-csp.html
+ * @link https://content-security-policy.com/strict-dynamic/
  */
 class CspProvider implements TemplateGlobalProvider
 {
@@ -73,12 +73,12 @@ class CspProvider implements TemplateGlobalProvider
     /**
      * Allows calling getCspNonce in the template for script inclusion
      *
-     * @return array
+     * @return array<string,string>
      */
     public static function get_template_global_variables()
     {
         return [
-            'getCspNonce'
+            'getCspNonce' => 'getCspNonce'
         ];
     }
 
@@ -96,7 +96,7 @@ class CspProvider implements TemplateGlobalProvider
 
     /**
      * Allow setting nonce from an external source
-     * @param  string $nonce
+     * @param string $nonce
      * @return void
      */
     public static function setCspNonce($nonce)
@@ -133,15 +133,17 @@ class CspProvider implements TemplateGlobalProvider
      * Add CSP to the response using a flexible strict dynamic way
      *
      * @param HTTPResponse $response
-     * @return HTTPResponse
+     * @return void
      */
     public static function addCspHeaders(HTTPResponse $response)
     {
+        // Only supported in https
         if (!Director::is_https()) {
             return;
         }
         $config = self::config();
 
+        // Only add if enabled in config
         if (!$config->enable_csp) {
             return;
         }
@@ -172,6 +174,5 @@ class CspProvider implements TemplateGlobalProvider
             $headerName = 'Content-Security-Policy-Report-Only';
         }
         $response->addHeader($headerName, $csp);
-        return $response;
     }
 }

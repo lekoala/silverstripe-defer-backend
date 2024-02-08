@@ -30,15 +30,18 @@ class DeferBackend extends Requirements_Backend
     private static $enable_js_modules = false;
 
     // It's better to write to the head with defer
+    /**
+     * @var boolean
+     */
     public $writeJavascriptToBody = false;
 
     /**
-     * @return $this
+     * @return DeferBackend
      */
     public static function getDeferBackend()
     {
         $backend = Requirements::backend();
-        if (!$backend instanceof self) {
+        if (!($backend instanceof DeferBackend)) {
             throw new Exception("Requirements backend is currently of class " . get_class($backend));
         }
         return $backend;
@@ -46,14 +49,14 @@ class DeferBackend extends Requirements_Backend
 
     /**
      * @param Requirements_Backend $oldBackend defaults to current backend
-     * @return $this
+     * @return DeferBackend
      */
     public static function replaceBackend(Requirements_Backend $oldBackend = null)
     {
         if ($oldBackend === null) {
             $oldBackend = Requirements::backend();
         }
-        $deferBackend = new static;
+        $deferBackend = new self();
         foreach ($oldBackend->getCSS() as $file => $opts) {
             $deferBackend->css($file, null, $opts);
         }
@@ -73,7 +76,7 @@ class DeferBackend extends Requirements_Backend
     }
 
     /**
-     * @return array
+     * @return array<string>
      */
     public static function listCookieTypes()
     {
@@ -84,7 +87,7 @@ class DeferBackend extends Requirements_Backend
      * Register the given JavaScript file as required.
      *
      * @param string $file Either relative to docroot or in the form "vendor/package:resource"
-     * @param array $options List of options. Available options include:
+     * @param array<string,mixed> $options List of options. Available options include:
      * - 'provides' : List of scripts files included in this file
      * - 'async' : Boolean value to set async attribute to script tag
      * - 'defer' : Boolean value to set defer attribute to script tag (true by default)
@@ -93,6 +96,8 @@ class DeferBackend extends Requirements_Backend
      * - 'crossorigin' : Cross-origin policy for the resource
      * - 'cookie-consent' : Type of cookie for conditionnal loading : strictly-necessary,functionality,tracking,targeting
      * - 'nomodule' : Boolean value to set nomodule attribute to script tag
+     *
+     * @return void
      */
     public function javascript($file, $options = [])
     {
@@ -138,7 +143,7 @@ class DeferBackend extends Requirements_Backend
 
     /**
      * @param string $name
-     * @param string|array $type Pass the type or an array of options
+     * @param mixed $type Pass the type or an array of options
      * @return void
      */
     public function themedJavascript($name, $type = null)
@@ -168,7 +173,7 @@ class DeferBackend extends Requirements_Backend
     /**
      * Get all css files
      *
-     * @return array
+     * @return array<string,mixed>
      */
     public function getCSS()
     {

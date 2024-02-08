@@ -9,23 +9,23 @@ use SilverStripe\Control\HTTPResponse;
 
 class DeferBackendTest extends SapphireTest
 {
-    public function testWriteToHeader()
+    public function testWriteToHeader():void
     {
         $backend = new DeferBackend;
         $this->assertFalse($backend->writeJavascriptToBody);
     }
 
-    public function testNonce()
+    public function testNonce():void
     {
         $this->assertNotEmpty(CspProvider::getCspNonce());
     }
 
-    public function testProvideTemplate()
+    public function testProvideTemplate():void
     {
         $this->assertContains("getCspNonce", CspProvider::get_template_global_variables());
     }
 
-    public function testAddSecurityHeaders()
+    public function testAddSecurityHeaders():void
     {
         $res = new HTTPResponse();
         CspProvider::addSecurityHeaders($res);
@@ -34,7 +34,7 @@ class DeferBackendTest extends SapphireTest
         $this->assertContains('referrer-policy', $headers, "Header not found in : " . implode(", ", $headers));
     }
 
-    public function testWrapScripts()
+    public function testWrapScripts():void
     {
         $backend = new DeferBackend;
         $backend->customScript("var test = 'test';");
