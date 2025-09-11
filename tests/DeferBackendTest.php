@@ -11,7 +11,7 @@ class DeferBackendTest extends SapphireTest
 {
     public function testWriteToHeader(): void
     {
-        $backend = new DeferBackend;
+        $backend = new DeferBackend();
         $this->assertFalse($backend->writeJavascriptToBody);
     }
 
@@ -36,7 +36,7 @@ class DeferBackendTest extends SapphireTest
 
     public function testWrapScripts(): void
     {
-        $backend = new DeferBackend;
+        $backend = new DeferBackend();
         $backend->customScript("var test = 'test';");
 
         $sampleHTML = <<<HTML

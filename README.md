@@ -1,8 +1,17 @@
 # SilverStripe Defer Backend module
 
-![Build Status](https://github.com/lekoala/silverstripe-defer-backend/actions/workflows/ci.yml/badge.svg)
-[![scrutinizer](https://scrutinizer-ci.com/g/lekoala/silverstripe-defer-backend/badges/quality-score.png?b=master)](https://scrutinizer-ci.com/g/lekoala/silverstripe-defer-backend/)
-[![Code coverage](https://codecov.io/gh/lekoala/silverstripe-defer-backend/branch/master/graph/badge.svg)](https://codecov.io/gh/lekoala/silverstripe-defer-backend)
+[![Build Status](https://github.com/lekoala/silverstripe-defer-backend/actions/workflows/ci.yml/badge.svg)](https://github.com/lekoala/silverstripe-defer-backend/actions)
+[![Scrutinizer Code Quality](https://scrutinizer-ci.com/g/lekoala/silverstripe-defer-backend/badges/quality-score.png?b=master)](https://scrutinizer-ci.com/g/lekoala/silverstripe-defer-backend/?branch=master)
+[![Code Coverage](https://scrutinizer-ci.com/g/lekoala/silverstripe-defer-backend/badges/coverage.png?b=master)](https://scrutinizer-ci.com/g/lekoala/silverstripe-defer-backend/?branch=master)
+[![Build Status](https://scrutinizer-ci.com/g/lekoala/silverstripe-defer-backend/badges/build.png?b=master)](https://scrutinizer-ci.com/g/lekoala/silverstripe-defer-backend/build-status/master)
+[![codecov.io](https://codecov.io/github/lekoala/silverstripe-defer-backend/coverage.svg?branch=master)](https://codecov.io/github/lekoala/silverstripe-defer-backend?branch=master)
+
+[![Latest Stable Version](https://poser.pugx.org/lekoala/silverstripe-defer-backend/version)](https://packagist.org/packages/lekoala/silverstripe-defer-backend)
+[![Latest Unstable Version](https://poser.pugx.org/lekoala/silverstripe-defer-backend/v/unstable)](//packagist.org/packages/lekoala/silverstripe-defer-backend)
+[![Total Downloads](https://poser.pugx.org/lekoala/silverstripe-defer-backend/downloads)](https://packagist.org/packages/lekoala/silverstripe-defer-backend)
+[![License](https://poser.pugx.org/lekoala/silverstripe-defer-backend/license)](https://packagist.org/packages/lekoala/silverstripe-defer-backend)
+[![Monthly Downloads](https://poser.pugx.org/lekoala/silverstripe-defer-backend/d/monthly)](https://packagist.org/packages/lekoala/silverstripe-defer-backend)
+[![Daily Downloads](https://poser.pugx.org/lekoala/silverstripe-defer-backend/d/daily)](https://packagist.org/packages/lekoala/silverstripe-defer-backend)
 
 ## Intro
 
@@ -131,7 +140,9 @@ Consider setting this to `csp_report_only` at the beginnning because enabling cs
 
 ## Compatibility
 
-Tested with ^4.10
+Tested with ^6
+
+Use previous branch for v4/v5
 
 ## Maintainer
 

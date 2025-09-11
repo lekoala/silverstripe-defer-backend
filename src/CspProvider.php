@@ -148,10 +148,11 @@ class CspProvider implements TemplateGlobalProvider
             return;
         }
 
-        $csp = "default-src 'self' data:";
+        $nonce = self::getCspNonce();
 
+        $csp = "default-src 'self' data:";
         $csp .= ';';
-        $csp .= "script-src 'nonce-" . self::getCspNonce() . "' 'strict-dynamic' 'unsafe-inline' 'unsafe-eval' https: http:;";
+        $csp .= "script-src 'nonce-" . $nonce . "' 'strict-dynamic' 'unsafe-inline' 'unsafe-eval' https: http:;";
         $csp .= "style-src * 'unsafe-inline';";
         $csp .= "object-src 'self';";
         $csp .= "img-src * data:;";

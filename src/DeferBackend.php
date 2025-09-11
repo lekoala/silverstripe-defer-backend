@@ -94,7 +94,8 @@ class DeferBackend extends Requirements_Backend
      * - 'type' : Override script type= value.
      * - 'integrity' : SubResource Integrity hash
      * - 'crossorigin' : Cross-origin policy for the resource
-     * - 'cookie-consent' : Type of cookie for conditionnal loading : strictly-necessary,functionality,tracking,targeting
+     * - 'cookie-consent' : Type of cookie for conditionnal loading
+     *      eg: strictly-necessary,functionality,tracking,targeting
      * - 'nomodule' : Boolean value to set nomodule attribute to script tag
      *
      * @return void
@@ -120,7 +121,9 @@ class DeferBackend extends Requirements_Backend
         }
         if (isset($options['cookie-consent'])) {
             if (!in_array($options['cookie-consent'], self::listCookieTypes())) {
-                throw new InvalidArgumentException("The cookie-consent value is invalid, it must be one of: strictly-necessary,functionality,tracking,targeting");
+                throw new InvalidArgumentException(
+                    "The cookie-consent value must be one of: strictly-necessary,functionality,tracking,targeting"
+                );
             }
             // switch to text plain for conditional loading
             $options['type'] = 'text/plain';
@@ -281,12 +284,17 @@ class DeferBackend extends Requirements_Backend
             // Make sure we don't wrap scripts concerned by security policies
             // Js modules are deferred by default, even if they are inlined, so not wrapping needed
             // @link https://stackoverflow.com/questions/41394983/how-to-defer-inline-javascript
-            if (empty($attributes['cookie-consent']) && strpos($script, 'window.addEventListener') === false && $attributes['type'] !== 'module') {
+            $wrapScript = empty($attributes['cookie-consent'])
+                && strpos($script, 'window.addEventListener') === false
+                && $attributes['type'] !== 'module';
+
+            if ($wrapScript) {
                 $script = "window.addEventListener('DOMContentLoaded', function() { $script });";
             }
 
             // Remove comments if any
-            $script = preg_replace('/(?:(?:\/\*(?:[^*]|(?:\*+[^*\/]))*\*+\/)|(?:(?<!\:|\\\|\'|\")\/\/.*))/', '', $script);
+            $commentsRegex = '/(?:(?:\/\*(?:[^*]|(?:\*+[^*\/]))*\*+\/)|(?:(?<!\:|\\\|\'|\")\/\/.*))/';
+            $script = preg_replace($commentsRegex, '', $script);
 
             $jsRequirements .= HTML::createTag(
                 'script',
